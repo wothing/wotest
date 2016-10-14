@@ -1,0 +1,18 @@
+// 这是注释，不支持行内注释
+set APP https://api.HIDDEN
+set GOPATH `env GOPATH`
+echo $GOPATH
+
+match $GOPATH `env GOPATH`
+
+post $APP/config/get
+header "Authorization" "Bearer xxxxxxxxx"
+json {"scope":"wechat"}
+ret 200
+match $body.code "11012"
+match $header.X-Request-Id[0] $resp.header.X-Request-Id[0]
+contains $body code
+
+echo $header
+
+echo $body
