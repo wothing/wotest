@@ -17,10 +17,13 @@ get [url]: 构建GET请求
 post [url]: 构建POST请求
 header [key value]: 配置请求Header
 json [var]: 配置请求Body
-ret [code]: 发起请求，并校验http status code。其中，code为空则不做校验
+ret [code?]: 发起请求，并校验http status code。其中，code为空则不做校验
 
-match: [a b]: 校验a是否等于b
 contains [a b]: 校验a中时候含有b
+eq: [a b]: 校验a是否等于b
+neq: [a b]: 校验a不等于b
+gt: [a b]: 校验a>b
+gte: [a b]: 校验a>=b
 ```
 
 如果一个参数中含有空格，请使用双引号'"'包裹，例如："Bearer xxxxxx"

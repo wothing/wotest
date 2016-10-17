@@ -120,7 +120,7 @@ var funcMap = map[string]func(*string) error{
 			fmt.Print("\n")
 		} else {
 			varReplacer(&params[0])
-			fmt.Printf("'%s' '%s'", params[0], strconv.Itoa(httptest.resp.StatusCode))
+			fmt.Printf("'%s' = '%s'", params[0], strconv.Itoa(httptest.resp.StatusCode))
 			if strconv.Itoa(httptest.resp.StatusCode) == params[0] {
 				passCount++
 				fmt.Print(pass, "\n")
@@ -132,25 +132,6 @@ var funcMap = map[string]func(*string) error{
 
 		return nil
 	},
-	"match": func(s *string) error {
-		params := strings.Split(*s, " ")
-		if len(params) != 2 {
-			return errors.New("match need 2 param")
-		}
-
-		varReplacer(&params[0])
-		varReplacer(&params[1])
-
-		fmt.Printf("[mat] '%s' '%s'", params[0], params[1])
-		if params[0] == params[1] {
-			passCount++
-			fmt.Println(pass)
-		} else {
-			failCount++
-			fmt.Println(failed)
-		}
-		return nil
-	},
 	"contains": func(s *string) error {
 		params := strings.Split(*s, " ")
 		if len(params) != 2 {
@@ -160,7 +141,7 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		fmt.Printf("[cot] '%s' '%s'", params[0], params[1])
+		fmt.Printf("[ast] '%s' ⊇ '%s'", params[0], params[1])
 		if strings.Contains(params[0], params[1]) {
 			passCount++
 			fmt.Print(pass, "\n")
@@ -169,6 +150,86 @@ var funcMap = map[string]func(*string) error{
 			fmt.Print(failed, "\n")
 		}
 
+		return nil
+	},
+	// equal
+	"eq": func(s *string) error {
+		params := strings.Split(*s, " ")
+		if len(params) != 2 {
+			return errors.New("match need 2 param")
+		}
+
+		varReplacer(&params[0])
+		varReplacer(&params[1])
+
+		fmt.Printf("[ast] '%s' = '%s'", params[0], params[1])
+		if params[0] == params[1] {
+			passCount++
+			fmt.Println(pass)
+		} else {
+			failCount++
+			fmt.Println(failed)
+		}
+		return nil
+	},
+	// not equal
+	"neq": func(s *string) error {
+		params := strings.Split(*s, " ")
+		if len(params) != 2 {
+			return errors.New("neq need 2 param")
+		}
+
+		varReplacer(&params[0])
+		varReplacer(&params[1])
+
+		fmt.Printf("[ast] '%s' ≠ '%s'", params[0], params[1])
+		if params[0] != params[1] {
+			passCount++
+			fmt.Print(pass, "\n")
+		} else {
+			failCount++
+			fmt.Print(failed, "\n")
+		}
+		return nil
+	},
+	// greater than
+	"gt": func(s *string) error {
+		params := strings.Split(*s, " ")
+		if len(params) != 2 {
+			return errors.New("gt need 2 param")
+		}
+
+		varReplacer(&params[0])
+		varReplacer(&params[1])
+
+		fmt.Printf("[ast] '%s' > '%s'", params[0], params[1])
+		if params[0] > params[1] {
+			passCount++
+			fmt.Print(pass, "\n")
+		} else {
+			failCount++
+			fmt.Print(failed, "\n")
+		}
+		return nil
+	},
+	// greater than or equal
+	"gte": func(s *string) error {
+		params := strings.Split(*s, " ")
+		if len(params) != 2 {
+			return errors.New("gte need 2 param")
+		}
+
+		varReplacer(&params[0])
+		varReplacer(&params[1])
+
+		fmt.Printf("[ast] '%s' ≥ '%s'", params[0], params[1])
+		if params[0] >= params[1] {
+			passCount++
+			fmt.Print(pass, "\n")
+		} else {
+			failCount++
+			fmt.Print(failed, "\n")
+		}
 		return nil
 	},
 	// TODO
@@ -202,9 +263,6 @@ func eval(s *string) {
 
 	replacer(s)
 
-	//fmt.Println(*s)
-	//fmt.Println(varMap)
-
 	cmds := cmdRgx.FindAllString(*s, -1)
 	for i, v := range cmds {
 		temp := v
@@ -218,13 +276,14 @@ func eval(s *string) {
 
 	if f, ok := funcMap[x[0]]; ok {
 		suffix := strings.TrimSpace(strings.TrimPrefix(*s, x[0]))
-		//varReplace(&suffix)
 		err := f(&suffix)
 		if err != nil {
 			Error(err.Error())
 			os.Exit(1)
 		}
 		*s = suffix
+	}else {
+		Warn("no such method")
 	}
 }
 
