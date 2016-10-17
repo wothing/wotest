@@ -117,7 +117,7 @@ var funcMap = map[string]func(*string) error{
 
 		fmt.Print("[ret] ")
 		if params[0] == "" {
-			fmt.Print(pass, "\n")
+			fmt.Print("\n")
 		} else {
 			varReplacer(&params[0])
 			fmt.Printf("'%s' '%s'", params[0], strconv.Itoa(httptest.resp.StatusCode))
@@ -235,7 +235,7 @@ func replacer(s *string) {
 }
 
 // set struct to varMap
-var stcRgx = regexp.MustCompile(`\{[\[\]":,\w\s]*\}`)
+var stcRgx = regexp.MustCompile(`\{.*\}`)
 
 func stcReplacer(s *string) {
 	stcs := stcRgx.FindAllString(*s, -1)

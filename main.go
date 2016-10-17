@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-var f string = "."
+var f = "."
 
 func main() {
 	flag.StringVar(&f, "f", f, "test files, if multi, using ';' to separate")
