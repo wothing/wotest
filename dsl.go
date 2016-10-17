@@ -132,6 +132,7 @@ var funcMap = map[string]func(*string) error{
 
 		return nil
 	},
+	// contains
 	"contains": func(s *string) error {
 		params := strings.Split(*s, " ")
 		if len(params) != 2 {
@@ -282,8 +283,8 @@ func eval(s *string) {
 			os.Exit(1)
 		}
 		*s = suffix
-	}else {
-		Warn("no such method")
+	} else {
+		Warn("no such method: '%s'", x[0])
 	}
 }
 
