@@ -18,5 +18,5 @@ func TestFileList(t *testing.T) {
 }
 
 func TestWalk(t *testing.T) {
-	fmt.Println(walk("./", suffix))
+	fmt.Println(walk("./", fileSuffix))
 }

@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-const fsuffix = ".wt"
+const fileSuffix = ".wt"
 
 // FileList parse loc
 func FileList(loc string) []string {
@@ -21,10 +21,10 @@ func FileList(loc string) []string {
 
 	data := []string{}
 	for i := range fs {
-		if strings.HasSuffix(fs[i], fsuffix) {
+		if strings.HasSuffix(fs[i], fileSuffix) {
 			data = append(data, fs[i])
 		} else {
-			data = append(data, walk(fs[i], fsuffix)...)
+			data = append(data, walk(fs[i], fileSuffix)...)
 		}
 	}
 

@@ -20,6 +20,7 @@ import (
 var f = "."
 
 func main() {
+	flag.BoolVar(&debugMode, "d", debugMode, "debug mode")
 	flag.StringVar(&f, "f", f, "test files, if multi, using ';' to separate")
 	flag.Parse()
 
