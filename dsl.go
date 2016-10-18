@@ -333,6 +333,7 @@ func varReplacer(s *string) {
 	for _, v := range varRgx.FindAllString(*s, -1) {
 		if k, ok := varMap[v]; ok {
 			*s = strings.Replace(*s, v, k, 1)
+			varReplacer(s)// TODO is this ok?
 		} else {
 			Warn("'%s' NOT EXIST", v)
 		}
