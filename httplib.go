@@ -34,7 +34,7 @@ type httpLib struct {
 	done bool
 }
 
-var httptest = httpLib{
+var httpReq = httpLib{
 	header: make(map[string]string),
 }
 

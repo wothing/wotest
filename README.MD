@@ -16,7 +16,7 @@ echo [var]: 输出，一般用户调试
 get [url]: 构建GET请求
 post [url]: 构建POST请求
 header [key value]: 配置请求Header
-json [var]: 配置请求Body
+body [var]: 配置请求Body
 ret [code?]: 发起请求，并校验http status code。其中，code为空则不做校验
 
 contains [a b]: 校验a中时候含有b

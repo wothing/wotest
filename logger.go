@@ -9,9 +9,13 @@ package main
 
 import "fmt"
 
+var debugMode = false
+
 func Debug(s string, para ...interface{}) {
-	s = "\033[0;33m" + s + "\033[0m\n"
-	fmt.Printf(s, para...)
+	if debugMode {
+		s = "\033[0;33m" + s + "\033[0m\n"
+		fmt.Printf(s, para...)
+	}
 }
 
 func Info(s string, para ...interface{}) {

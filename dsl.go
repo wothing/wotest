@@ -64,9 +64,9 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 
 		fmt.Printf("[get] '%s'\n", params[0])
-		httptest.method = "GET"
-		httptest.url = params[0]
-		httptest.done = false
+		httpReq.method = "GET"
+		httpReq.url = params[0]
+		httpReq.done = false
 		return nil
 	},
 	"post": func(s *string) error {
@@ -78,9 +78,9 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 
 		fmt.Printf("[pos] '%s'\n", params[0])
-		httptest.method = "POST"
-		httptest.url = params[0]
-		httptest.done = false
+		httpReq.method = "POST"
+		httpReq.url = params[0]
+		httpReq.done = false
 		return nil
 	},
 	"header": func(s *string) error {
@@ -93,18 +93,18 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[1])
 
 		fmt.Printf("[hed] '%s' '%s'\n", params[0], params[1])
-		httptest.header[strings.TrimSpace(params[0])] = strings.TrimSpace(params[1])
+		httpReq.header[strings.TrimSpace(params[0])] = strings.TrimSpace(params[1])
 		return nil
 	},
-	"json": func(s *string) error {
+	"body": func(s *string) error {
 		params := strings.Split(*s, " ")
 		if len(params) > 1 {
-			return errors.New("json need 1 param")
+			return errors.New("body need 1 param")
 		}
 
 		varReplacer(&params[0])
-		fmt.Printf("[jsn] '%s'\n", params[0])
-		httptest.reqBody = params[0]
+		fmt.Printf("[bdy] '%s'\n", params[0])
+		httpReq.reqBody = params[0]
 		return nil
 	},
 	"ret": func(s *string) error {
@@ -113,15 +113,15 @@ var funcMap = map[string]func(*string) error{
 			return errors.New("ret need 0 or 1 param")
 		}
 
-		httptest.do()
+		httpReq.do()
 
 		fmt.Print("[ret] ")
 		if params[0] == "" {
 			fmt.Print("\n")
 		} else {
 			varReplacer(&params[0])
-			fmt.Printf("'%s' = '%s'", params[0], strconv.Itoa(httptest.resp.StatusCode))
-			if strconv.Itoa(httptest.resp.StatusCode) == params[0] {
+			fmt.Printf("'%s' = '%s'", params[0], strconv.Itoa(httpReq.resp.StatusCode))
+			if strconv.Itoa(httpReq.resp.StatusCode) == params[0] {
 				passCount++
 				fmt.Print(pass, "\n")
 			} else {
