@@ -103,6 +103,7 @@ var funcMap = map[string]func(*string) error{
 		}
 
 		varReplacer(&params[0])
+
 		fmt.Printf("[bdy] '%s'\n", params[0])
 		httpReq.reqBody = params[0]
 		return nil
@@ -132,8 +133,8 @@ var funcMap = map[string]func(*string) error{
 
 		return nil
 	},
-	// contains
-	"contains": func(s *string) error {
+	// has
+	"has": func(s *string) error {
 		params := strings.Split(*s, " ")
 		if len(params) != 2 {
 			return errors.New("contains need 2 param")

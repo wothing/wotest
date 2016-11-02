@@ -13,6 +13,7 @@ import (
 	"flag"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"time"
 )
@@ -29,7 +30,7 @@ func main() {
 	for _, v := range FileList(f) {
 		data, err := ioutil.ReadFile(v)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		reader := bufio.NewReader(bytes.NewBuffer(data))
 		for {

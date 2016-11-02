@@ -1,5 +1,9 @@
 # wotest
 
+## changelog
+
+contains 重命名为 has
+
 #### go语言构建的DSL测试库，用于构建Http测试与断言。所有语句在后缀为.wt的文本文件中撰写。编码采用UTF-8
 
 基础语法：
