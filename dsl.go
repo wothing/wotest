@@ -118,7 +118,7 @@ var funcMap = map[string]func(*string) error{
 
 		fmt.Print("[ret] ")
 		if params[0] == "" {
-			fmt.Print("\n")
+			fmt.Print(httpReq.resp.StatusCode, "\n")
 		} else {
 			varReplacer(&params[0])
 			fmt.Printf("'%s' = '%s'", params[0], strconv.Itoa(httpReq.resp.StatusCode))
