@@ -1,9 +1,5 @@
 # wotest
 
-## changelog
-
-contains 重命名为 has
-
 #### go语言构建的DSL测试库，用于构建Http测试与断言。所有语句在后缀为.wt的文本文件中撰写。编码采用UTF-8
 
 基础语法：
@@ -11,6 +7,7 @@ contains 重命名为 has
 所有语法关键词均为小写字母。
 
 ```
+load [file.wt]: 加载依赖测试用例
 set [name var]: 设置全局变量
 $var: 取出全局变量。注意：$header,$body,$resp相关的前缀为保留前缀，请勿占用
 env [name]: 读取系统环境变量
@@ -37,3 +34,5 @@ gte: [a b]: 校验a>=b
 用例请参见`demo.wt`
 
 ![demo](./demo.png)
+
+### FAQ:
