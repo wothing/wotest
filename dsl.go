@@ -251,12 +251,17 @@ var funcMap = map[string]func(*string) error{
 // parse `xyz xyz`->xyz xyz
 var cmdRgx = regexp.MustCompile("\\`[\\w\\s]+\\`")
 
-func eval(s *string) {
-	*s = strings.TrimSpace(*s)
+var hasSpace = false
 
+func eval(s *string) {
 	if *s == "" {
-		fmt.Println()
+		if !hasSpace {
+			hasSpace = true
+			fmt.Println()
+		}
 		return
+	} else {
+		hasSpace = false
 	}
 
 	if strings.HasPrefix(*s, "//") {

@@ -15,6 +15,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -25,26 +26,14 @@ func main() {
 	flag.StringVar(&f, "f", f, "test files, if multi, using ';' to separate")
 	flag.Parse()
 
+	if os.Getenv("debug") != "" || os.Getenv("DEBUG") != "" {
+		debugMode = true
+	}
+
 	var start = time.Now()
 	// read then run code
 	for _, v := range FileList(f) {
-		data, err := ioutil.ReadFile(v)
-		if err != nil {
-			log.Fatal(err)
-		}
-		reader := bufio.NewReader(bytes.NewBuffer(data))
-		for {
-			data, _, err := reader.ReadLine()
-			if err != nil {
-				if err == io.EOF {
-					break
-				} else {
-					panic(err)
-				}
-			}
-			temp := string(data)
-			eval(&temp)
-		}
+		fileHandler(v)
 	}
 
 	if failCount == 0 {
@@ -53,5 +42,38 @@ func main() {
 		Error("\n%d assert failed", failCount)
 		os.Exit(2)
 	}
+}
 
+var visitMap = make(map[string]bool)
+
+func fileHandler(fileName string) {
+	if visitMap[fileName] {
+		return
+	} else {
+		visitMap[fileName] = true
+	}
+
+	data, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	reader := bufio.NewReader(bytes.NewBuffer(data))
+	for {
+		data, _, err := reader.ReadLine()
+		if err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				panic(err)
+			}
+		}
+		temp := strings.TrimSpace(string(data)) // trim space
+		if strings.HasPrefix(temp, "load ") {
+			fileHandler(strings.TrimSpace(temp[4:]))
+			continue
+		}
+
+		eval(&temp)
+	}
 }
