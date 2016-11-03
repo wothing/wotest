@@ -9,6 +9,7 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"strings"
 )
@@ -34,7 +35,7 @@ func FileList(loc string) []string {
 func walk(f string, suffix string) []string {
 	fis, err := ioutil.ReadDir(f)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	list := []string{}

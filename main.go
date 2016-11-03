@@ -59,21 +59,31 @@ func fileHandler(fileName string) {
 	}
 
 	reader := bufio.NewReader(bytes.NewBuffer(data))
+	str := ""
 	for {
 		data, _, err := reader.ReadLine()
 		if err != nil {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				log.Fatal(err)
 			}
 		}
-		temp := strings.TrimSpace(string(data)) // trim space
-		if strings.HasPrefix(temp, "load ") {
-			fileHandler(strings.TrimSpace(temp[4:]))
+		str = str + strings.TrimSpace(string(data)) // trim space
+
+		// judge if line breaker
+		if strings.Contains(str, ` \r`) {
+			str = strings.TrimSpace(strings.TrimSuffix(str, ` \r`))
 			continue
 		}
 
-		eval(&temp)
+		if strings.HasPrefix(str, "load ") {
+			fileHandler(strings.TrimSpace(str[4:]))
+			str = ""
+			continue
+		}
+
+		eval(&str)
+		str = ""
 	}
 }

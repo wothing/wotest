@@ -264,7 +264,8 @@ func eval(s *string) {
 		hasSpace = false
 	}
 
-	if strings.HasPrefix(*s, "//") {
+	if strings.HasPrefix(*s, `//`) {
+		hasSpace = true
 		return
 	}
 
