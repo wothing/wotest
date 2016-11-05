@@ -11,6 +11,7 @@ import (
 	"bufio"
 	"bytes"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -59,7 +60,7 @@ func fileHandler(fileName string) {
 	}
 
 	reader := bufio.NewReader(bytes.NewBuffer(data))
-	str := ""
+	rawStr := ""
 	for {
 		data, _, err := reader.ReadLine()
 		if err != nil {
@@ -69,21 +70,38 @@ func fileHandler(fileName string) {
 				log.Fatal(err)
 			}
 		}
-		str = str + strings.TrimSpace(string(data)) // trim space
 
-		// judge if line breaker
-		if strings.Contains(str, ` \r`) {
-			str = strings.TrimSpace(strings.TrimSuffix(str, ` \r`))
+		rawStr = rawStr + string(data)
+
+		// line breaker
+		if strings.HasSuffix(rawStr, ` \r`) {
+			rawStr = strings.TrimSuffix(rawStr, ` \r`)
 			continue
 		}
 
-		if strings.HasPrefix(str, "load ") {
-			fileHandler(strings.TrimSpace(str[4:]))
-			str = ""
+		// trim space
+		rawStr = strings.TrimSpace(rawStr)
+
+		// empty line
+		if rawStr == "" {
+			fmt.Println()
 			continue
 		}
 
-		eval(&str)
-		str = ""
+		// comment line
+		if strings.HasPrefix(rawStr, `//`) {
+			rawStr = ""
+			continue
+		}
+
+		// load prefix
+		if strings.HasPrefix(rawStr, `load `) {
+			fileHandler(strings.TrimSpace(rawStr[5:]))
+			rawStr = ""
+			continue
+		}
+
+		eval(&rawStr)
+		rawStr = ""
 	}
 }

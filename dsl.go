@@ -30,16 +30,13 @@ var funcMap = map[string]func(*string) error{
 		if len(params) > 1 {
 			return errors.New("env need 1 param")
 		}
+		varReplacer(&params[0])
 		*s = os.Getenv(params[0])
 		return nil
 	},
 	"echo": func(s *string) error {
-		params := strings.Split(*s, " ")
-		if len(params) > 1 {
-			return errors.New("echo need 1 param")
-		}
-		varReplacer(&params[0])
-		Debug(params[0])
+		varReplacer(s)
+		Debug(*s)
 		return nil
 	},
 	"set": func(s *string) error {
@@ -251,26 +248,10 @@ var funcMap = map[string]func(*string) error{
 // parse `xyz xyz`->xyz xyz
 var cmdRgx = regexp.MustCompile("\\`[\\w\\s]+\\`")
 
-var hasSpace = false
-
 func eval(s *string) {
-	if *s == "" {
-		if !hasSpace {
-			hasSpace = true
-			fmt.Println()
-		}
-		return
-	} else {
-		hasSpace = false
-	}
-
-	if strings.HasPrefix(*s, `//`) {
-		hasSpace = true
-		return
-	}
-
 	replacer(s)
 
+	// internal cmd
 	cmds := cmdRgx.FindAllString(*s, -1)
 	for i, v := range cmds {
 		temp := v
