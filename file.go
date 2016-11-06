@@ -10,6 +10,7 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -22,10 +23,15 @@ func FileList(loc string) []string {
 
 	data := []string{}
 	for i := range fs {
-		if strings.HasSuffix(fs[i], fileSuffix) {
-			data = append(data, fs[i])
-		} else {
+		// check if is file or dir
+		fi, err := os.Stat(fs[i])
+		if err != nil {
+			log.Fatal(err)
+		}
+		if fi.IsDir() {
 			data = append(data, walk(fs[i], fileSuffix)...)
+		} else {
+			data = append(data, fs[i])
 		}
 	}
 
