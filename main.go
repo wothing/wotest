@@ -59,6 +59,8 @@ func fileHandler(fileName string) {
 		log.Fatal(err)
 	}
 
+	var prevEmpty = true
+
 	reader := bufio.NewReader(bytes.NewBuffer(data))
 	rawStr := ""
 	for {
@@ -84,7 +86,10 @@ func fileHandler(fileName string) {
 
 		// empty line
 		if rawStr == "" {
-			fmt.Println()
+			if !prevEmpty {
+				fmt.Println()
+			}
+			prevEmpty = true
 			continue
 		}
 
@@ -93,6 +98,8 @@ func fileHandler(fileName string) {
 			rawStr = ""
 			continue
 		}
+
+		prevEmpty = false
 
 		// load prefix
 		if strings.HasPrefix(rawStr, `load `) {
