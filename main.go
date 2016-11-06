@@ -32,6 +32,12 @@ func main() {
 	}
 
 	var start = time.Now()
+
+	args := flag.Args()
+	if len(args) != 0 {
+		f = strings.Join(args, ";")
+	}
+
 	// read then run code
 	for _, v := range FileList(f) {
 		fileHandler(v)
