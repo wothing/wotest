@@ -23,7 +23,5 @@ neq $n[1] $n[2]
 
 // array
 set m {"addrs":["a","b","c"]}
-echo $m
 echo $m.addrs
-echo $m.addrs[1]
-//eq $m.addrs[1] b
+eq $m.addrs[1] b
