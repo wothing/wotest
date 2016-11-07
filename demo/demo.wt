@@ -18,9 +18,12 @@ eq $y.name $z.info.name
 
 // array
 set n ["a","b","c"]
-neq "$n.1" $n.2
+echo $n[1]
+neq $n[1] $n[2]
 
 // array
 set m {"addrs":["a","b","c"]}
+echo $m
 echo $m.addrs
-eq $m.addrs.1 b
+echo $m.addrs[1]
+//eq $m.addrs[1] b

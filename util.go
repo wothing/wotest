@@ -30,7 +30,7 @@ func dataWalker(prefix string, x interface{}) {
 
 	case []interface{}:
 		for i, v := range s {
-			dataWalker(prefix+"."+strconv.Itoa(i), v)
+			dataWalker(prefix+"["+strconv.Itoa(i)+"]", v)
 		}
 
 	default:

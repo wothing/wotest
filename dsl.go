@@ -49,8 +49,6 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		fmt.Println("p", params[1])
-
 		var x interface{}
 		err := json.Unmarshal([]byte(params[1]), &x)
 		if err == nil {
@@ -278,13 +276,15 @@ func replacer(s *string) {
 }
 
 // set struct to varMap
-var stcRgx = regexp.MustCompile(`[\{|\[].+[\}|\]]`)
+// SPACE{}
+// SPACE[]
+var stcRgx = regexp.MustCompile(`\s+?[\{|\[].+[\}|\]]$`)
 
 func stcReplacer(s *string) {
 	stcs := stcRgx.FindAllString(*s, -1)
 	for i, v := range stcs {
 		varMap["$.stc."+strconv.Itoa(i)] = v
-		*s = strings.Replace(*s, v, "$.stc."+strconv.Itoa(i), 1)
+		*s = strings.Replace(*s, v, " $.stc."+strconv.Itoa(i), 1)
 	}
 }
 
@@ -293,7 +293,6 @@ var quoRgx = regexp.MustCompile(`".+?"`)
 
 func quoReplacer(s *string) {
 	quos := quoRgx.FindAllString(*s, -1)
-
 	for i, v := range quos {
 		varMap["$.quo."+strconv.Itoa(i)] = strings.Trim(v, `"`)
 		*s = strings.Replace(*s, v, "$.quo."+strconv.Itoa(i), 1)
@@ -308,7 +307,7 @@ func spcReplacer(s *string) {
 }
 
 // parse $xxx
-var varRgx = regexp.MustCompile("\\$[\\w\\.\\-]+")
+var varRgx = regexp.MustCompile(`\$[\w\.\[\]\-]+`)
 
 // TODO not found warn
 func varReplacer(s *string) {
