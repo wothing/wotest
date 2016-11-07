@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -44,7 +45,7 @@ func (h *httpLib) do() {
 
 		req, err := http.NewRequest(h.method, h.url, bytes.NewBuffer([]byte(h.reqBody)))
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		for k, v := range h.header {
@@ -53,7 +54,7 @@ func (h *httpLib) do() {
 
 		h.resp, err = client.Do(req)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		h.respBody, _ = ioutil.ReadAll(h.resp.Body)
