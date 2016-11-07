@@ -8,6 +8,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -48,7 +49,15 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		varMap["$"+params[0]] = params[1]
+		fmt.Println("p", params[1])
+
+		var x interface{}
+		err := json.Unmarshal([]byte(params[1]), &x)
+		if err == nil {
+			dataWalker("$"+params[0], x)
+		} else {
+			varMap["$"+params[0]] = params[1]
+		}
 
 		return nil
 	},
@@ -257,6 +266,7 @@ func eval(s *string) {
 		}
 		*s = suffix
 	} else {
+		failCount++
 		Warn("no such method: '%s'", x[0])
 	}
 }
@@ -268,11 +278,10 @@ func replacer(s *string) {
 }
 
 // set struct to varMap
-var stcRgx = regexp.MustCompile(`\{.*\}`)
+var stcRgx = regexp.MustCompile(`[\{|\[].+[\}|\]]`)
 
 func stcReplacer(s *string) {
 	stcs := stcRgx.FindAllString(*s, -1)
-
 	for i, v := range stcs {
 		varMap["$.stc."+strconv.Itoa(i)] = v
 		*s = strings.Replace(*s, v, "$.stc."+strconv.Itoa(i), 1)
@@ -299,7 +308,7 @@ func spcReplacer(s *string) {
 }
 
 // parse $xxx
-var varRgx = regexp.MustCompile("\\$[\\w\\.\\[\\]\\-]+")
+var varRgx = regexp.MustCompile("\\$[\\w\\.\\-]+")
 
 // TODO not found warn
 func varReplacer(s *string) {

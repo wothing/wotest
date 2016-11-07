@@ -1,0 +1,26 @@
+set a1 "a1"
+set a2 "a2 $a1"
+set a3 "a3 $a2"
+echo $a3
+eq $a3 "a3 a2 a1"
+
+// set with space
+set x " x with space perfix"
+echo $x
+neq $x "x without space perfix"
+
+// set obj
+set y {"name":"elvizlai","age":28}
+echo "test struct: $y.name"
+set z {"info":$y}
+echo "test embed struct: $z.info.name"
+eq $y.name $z.info.name
+
+// array
+set n ["a","b","c"]
+neq "$n.1" $n.2
+
+// array
+set m {"addrs":["a","b","c"]}
+echo $m.addrs
+eq $m.addrs.1 b

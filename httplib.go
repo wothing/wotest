@@ -10,11 +10,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -85,26 +83,5 @@ func (h *httpLib) do() {
 			varMap["$body"] = string(h.respBody)
 			varMap["$resp.body"] = string(h.respBody)
 		}
-	}
-}
-
-// TODO may add more type assert
-func dataWalker(prefix string, x interface{}) {
-	data, _ := json.Marshal(x)
-	varMap[prefix] = string(data)
-
-	switch s := x.(type) {
-	case map[string]interface{}:
-		for l, v := range s {
-			dataWalker(prefix+"."+l, v)
-		}
-
-	case []interface{}:
-		for i, v := range s {
-			dataWalker(prefix+"["+strconv.Itoa(i)+"]", v)
-		}
-
-	default:
-		varMap[prefix] = fmt.Sprint(x) // force write
 	}
 }
