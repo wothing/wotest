@@ -48,36 +48,26 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		varMap["$"+params[0]] = strings.TrimSpace(params[1])
+		varMap["$"+params[0]] = params[1]
 
 		return nil
 	},
 	"get": func(s *string) error {
-		params := strings.Split(*s, " ")
-		if len(params) != 1 {
-			return errors.New("get need 1 param")
-		}
+		varReplacer(s)
 
-		varReplacer(&params[0])
-
-		fmt.Printf("[get] '%s'\n", params[0])
+		fmt.Printf("[get] '%s'\n", *s)
 		httpReq.method = "GET"
-		httpReq.url = params[0]
 		httpReq.done = false
+		httpReq.url = *s
 		return nil
 	},
 	"post": func(s *string) error {
-		params := strings.Split(*s, " ")
-		if len(params) != 1 {
-			return errors.New("post need 1 param")
-		}
+		varReplacer(s)
 
-		varReplacer(&params[0])
-
-		fmt.Printf("[pos] '%s'\n", params[0])
+		fmt.Printf("[pos] '%s'\n", *s)
 		httpReq.method = "POST"
-		httpReq.url = params[0]
 		httpReq.done = false
+		httpReq.url = *s
 		return nil
 	},
 	"header": func(s *string) error {
@@ -94,15 +84,10 @@ var funcMap = map[string]func(*string) error{
 		return nil
 	},
 	"body": func(s *string) error {
-		params := strings.Split(*s, " ")
-		if len(params) > 1 {
-			return errors.New("body need 1 param")
-		}
+		varReplacer(s)
 
-		varReplacer(&params[0])
-
-		fmt.Printf("[bdy] '%s'\n", params[0])
-		httpReq.reqBody = params[0]
+		fmt.Printf("[bdy] '%s'\n", *s)
+		httpReq.reqBody = *s
 		return nil
 	},
 	"ret": func(s *string) error {
