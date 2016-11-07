@@ -12,7 +12,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -22,8 +21,6 @@ var failCount = 0
 
 const pass = "\033[0;32m ✔ \033[0m"
 const failed = "\033[0;31m ✘ \033[0m"
-
-var varMap = map[string]string{}
 
 var funcMap = map[string]func(*string) error{
 	"env": func(s *string) error {
@@ -237,9 +234,6 @@ var funcMap = map[string]func(*string) error{
 	},
 }
 
-// parse `xyz xyz`->xyz xyz
-var cmdRgx = regexp.MustCompile("\\`[\\w\\s]+\\`")
-
 func eval(s *string) {
 	replacer(s)
 
@@ -266,57 +260,5 @@ func eval(s *string) {
 	} else {
 		failCount++
 		Warn("no such method: '%s'", x[0])
-	}
-}
-
-func replacer(s *string) {
-	stcReplacer(s)
-	quoReplacer(s)
-	spcReplacer(s)
-}
-
-// set struct to varMap
-// SPACE{}
-// SPACE[]
-var stcRgx = regexp.MustCompile(`\s+?[\{|\[].+[\}|\]]$`)
-
-func stcReplacer(s *string) {
-	stcs := stcRgx.FindAllString(*s, -1)
-	for i, v := range stcs {
-		varMap["$.stc."+strconv.Itoa(i)] = v
-		*s = strings.Replace(*s, v, " $.stc."+strconv.Itoa(i), 1)
-	}
-}
-
-// set "xyz abc" to varMap
-var quoRgx = regexp.MustCompile(`".+?"`)
-
-func quoReplacer(s *string) {
-	quos := quoRgx.FindAllString(*s, -1)
-	for i, v := range quos {
-		varMap["$.quo."+strconv.Itoa(i)] = strings.Trim(v, `"`)
-		*s = strings.Replace(*s, v, "$.quo."+strconv.Itoa(i), 1)
-	}
-}
-
-// trim space to one
-var spcRgx = regexp.MustCompile(`\s{2,}`)
-
-func spcReplacer(s *string) {
-	*s = spcRgx.ReplaceAllString(*s, " ")
-}
-
-// parse $xxx
-var varRgx = regexp.MustCompile(`\$[\w\.\[\]\-]+`)
-
-// TODO not found warn
-func varReplacer(s *string) {
-	for _, v := range varRgx.FindAllString(*s, -1) {
-		if k, ok := varMap[v]; ok {
-			*s = strings.Replace(*s, v, k, 1)
-			varReplacer(s) // TODO is this ok?
-		} else {
-			Warn("'%s' NOT EXIST", v)
-		}
 	}
 }
