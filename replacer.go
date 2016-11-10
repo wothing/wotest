@@ -29,7 +29,7 @@ var structRgx = regexp.MustCompile(`\s{1,}?[\{|\[].+[\}|\]]$`)
 func structReplacer(s *string) {
 	ss := structRgx.FindAllString(*s, -1)
 	for i, v := range ss {
-		varMap["$.stc."+strconv.Itoa(i)] = v
+		varMap["$.stc."+strconv.Itoa(i)] = strings.TrimSpace(v)
 		*s = strings.Replace(*s, v, " $.stc."+strconv.Itoa(i), 1)
 	}
 }
