@@ -69,4 +69,4 @@ func varReplacer(s *string) {
 }
 
 // parse `xyz xyz`->xyz xyz
-var cmdRgx = regexp.MustCompile("\\`[\\w\\s]+\\`")
+var cmdRgx = regexp.MustCompile("\\`[\\w\\s\\$.]+\\`")
