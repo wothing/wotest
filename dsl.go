@@ -32,6 +32,21 @@ var funcMap = map[string]func(*string) error{
 		*s = os.Getenv(params[0])
 		return nil
 	},
+	"pretty": func(s *string) error {
+		varReplacer(s)
+		var t interface{}
+		err := json.Unmarshal([]byte(*s), &t)
+		if err != nil {
+			return err
+		} else {
+			b, err := json.MarshalIndent(t, "", "  ")
+			if err != nil {
+				return err
+			}
+			*s = string(b)
+		}
+		return nil
+	},
 	"echo": func(s *string) error {
 		varReplacer(s)
 		Debug(*s)
