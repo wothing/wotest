@@ -11,6 +11,7 @@ neq $x "x without space perfix"
 
 // set obj
 set y {"name":"elvizlai","age":28}
+echo `pretty $y`
 echo "test struct: $y.name"
 set z {"info":$y}
 echo "test embed struct: $z.info.name"

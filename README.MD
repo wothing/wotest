@@ -12,6 +12,7 @@ set [name var]: 设置全局变量
 $var: 取出全局变量。注意：$header,$body,$resp相关的前缀为保留前缀，请勿占用
 env [name]: 读取系统环境变量
 
+pretty [var]: 美化json，用于跟echo联合使用
 echo [var]: 输出，一般用于调试
 
 get [url]: 构建GET请求
