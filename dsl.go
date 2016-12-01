@@ -43,7 +43,7 @@ var funcMap = map[string]func(*string) error{
 			if err != nil {
 				return err
 			}
-			*s = string(b)
+			Debug(string(b))
 		}
 		return nil
 	},
