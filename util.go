@@ -32,6 +32,8 @@ func dataWalker(prefix string, x interface{}) {
 		for i, v := range s {
 			dataWalker(prefix+"["+strconv.Itoa(i)+"]", v)
 		}
+	case float64:
+		varMap[prefix] = strconv.FormatFloat(s, 'f', -1, 64)
 
 	default:
 		varMap[prefix] = fmt.Sprint(x) // force write
