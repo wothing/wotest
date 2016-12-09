@@ -10,19 +10,19 @@ package main
 import "testing"
 
 func TestDebug(t *testing.T) {
-	Debug("hidden")
+	Debugf("hidden")
 	debugMode = true
-	Debug("debug")
+	Debugf("debug")
 }
 
 func TestInfo(t *testing.T) {
-	Info("info")
+	Infof("info")
 }
 
 func TestWarn(t *testing.T) {
-	Warn("warn")
+	Warnf("warn")
 }
 
 func TestError(t *testing.T) {
-	Error("error")
+	Errorf("error")
 }

@@ -19,7 +19,7 @@ import (
 
 var client = &http.Client{Timeout: 30 * time.Second}
 
-type httpLib struct {
+type httpReq struct {
 	method string
 	url    string
 
@@ -33,11 +33,18 @@ type httpLib struct {
 	done bool
 }
 
-var httpReq = httpLib{
+var req = httpReq{
 	header: make(map[string]string),
 }
 
-func (h *httpLib) do() {
+func newReq(method string) httpReq {
+	return httpReq{
+		method: method,
+		header: make(map[string]string),
+	}
+}
+
+func (h *httpReq) do() {
 	if !h.done {
 		h.done = true
 

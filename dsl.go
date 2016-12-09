@@ -16,9 +16,6 @@ import (
 	"strings"
 )
 
-var passCount = 0
-var failCount = 0
-
 const pass = "\033[0;32m ✔ \033[0m"
 const failed = "\033[0;31m ✘ \033[0m"
 
@@ -43,13 +40,13 @@ var funcMap = map[string]func(*string) error{
 			if err != nil {
 				return err
 			}
-			Debug(string(b))
+			Debugf(string(b))
 		}
 		return nil
 	},
 	"echo": func(s *string) error {
 		varReplacer(s)
-		Debug(*s)
+		Debugf(*s)
 		return nil
 	},
 	"set": func(s *string) error {
@@ -75,18 +72,18 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(s)
 
 		fmt.Printf("[get] '%s'\n", *s)
-		httpReq.method = "GET"
-		httpReq.done = false
-		httpReq.url = *s
+
+		req = newReq("GET")
+		req.url = *s
 		return nil
 	},
 	"post": func(s *string) error {
 		varReplacer(s)
 
 		fmt.Printf("[pos] '%s'\n", *s)
-		httpReq.method = "POST"
-		httpReq.done = false
-		httpReq.url = *s
+
+		req = newReq("POST")
+		req.url = *s
 		return nil
 	},
 	"header": func(s *string) error {
@@ -99,14 +96,16 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[1])
 
 		fmt.Printf("[hed] '%s' '%s'\n", params[0], params[1])
-		httpReq.header[strings.TrimSpace(params[0])] = strings.TrimSpace(params[1])
+
+		req.header[strings.TrimSpace(params[0])] = strings.TrimSpace(params[1])
 		return nil
 	},
 	"body": func(s *string) error {
 		varReplacer(s)
 
 		fmt.Printf("[bdy] '%s'\n", *s)
-		httpReq.reqBody = *s
+
+		req.reqBody = *s
 		return nil
 	},
 	"ret": func(s *string) error {
@@ -115,15 +114,16 @@ var funcMap = map[string]func(*string) error{
 			return errors.New("ret need 0 or 1 param")
 		}
 
-		httpReq.do()
+		req.do()
 
 		fmt.Print("[ret] ")
+
 		if params[0] == "" {
-			fmt.Print(httpReq.resp.StatusCode, "\n")
+			fmt.Print(req.resp.StatusCode, "\n")
 		} else {
 			varReplacer(&params[0])
-			fmt.Printf("'%s' = '%s'", params[0], strconv.Itoa(httpReq.resp.StatusCode))
-			if strconv.Itoa(httpReq.resp.StatusCode) == params[0] {
+			fmt.Printf("'%s' = '%s'", params[0], strconv.Itoa(req.resp.StatusCode))
+			if strconv.Itoa(req.resp.StatusCode) == params[0] {
 				passCount++
 				fmt.Print(pass, "\n")
 			} else {
@@ -145,6 +145,7 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[1])
 
 		fmt.Printf("[ast] '%s' ⊇ '%s'", params[0], params[1])
+
 		if strings.Contains(params[0], params[1]) {
 			passCount++
 			fmt.Print(pass, "\n")
@@ -166,6 +167,7 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[1])
 
 		fmt.Printf("[ast] '%s' = '%s'", params[0], params[1])
+
 		if params[0] == params[1] {
 			passCount++
 			fmt.Println(pass)
@@ -186,6 +188,7 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[1])
 
 		fmt.Printf("[ast] '%s' ≠ '%s'", params[0], params[1])
+
 		if params[0] != params[1] {
 			passCount++
 			fmt.Print(pass, "\n")
@@ -206,6 +209,7 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[1])
 
 		fmt.Printf("[ast] '%s' > '%s'", params[0], params[1])
+
 		if params[0] > params[1] {
 			passCount++
 			fmt.Print(pass, "\n")
@@ -268,12 +272,12 @@ func eval(s *string) {
 		suffix := strings.TrimSpace(strings.TrimPrefix(*s, x[0]))
 		err := f(&suffix)
 		if err != nil {
-			Error(err.Error())
+			Errorf(err.Error())
 			os.Exit(1)
 		}
 		*s = suffix
 	} else {
 		failCount++
-		Warn("no such method: '%s'", x[0])
+		Warnf("no such method: '%s'", x[0])
 	}
 }

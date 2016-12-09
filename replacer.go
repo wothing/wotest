@@ -63,7 +63,7 @@ func varReplacer(s *string) {
 			*s = strings.Replace(*s, v, k, 1)
 			varReplacer(s) // TODO is this ok?
 		} else {
-			Warn("'%s' NOT EXIST", v)
+			Warnf("'%s' NOT EXIST", v)
 		}
 	}
 }

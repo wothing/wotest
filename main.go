@@ -8,18 +8,14 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"flag"
-	"fmt"
-	"io"
-	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 	"time"
 )
 
+var passCount = 0
+var failCount = 0
 var f = "."
 
 func main() {
@@ -44,77 +40,9 @@ func main() {
 	}
 
 	if failCount == 0 {
-		Info("\nall %d assert passed, using: %s", passCount, time.Now().Sub(start))
+		Infof("\nall %d assert passed, using: %s", passCount, time.Now().Sub(start))
 	} else {
-		Error("\n%d assert failed", failCount)
+		Errorf("\n%d assert passed, %d assert failed, using: %s", passCount, failCount, time.Now().Sub(start))
 		os.Exit(2)
-	}
-}
-
-var visitMap = make(map[string]bool)
-
-func fileHandler(fileName string) {
-	if visitMap[fileName] {
-		return
-	} else {
-		visitMap[fileName] = true
-	}
-
-	data, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var prevEmpty = true
-
-	reader := bufio.NewReader(bytes.NewBuffer(data))
-	rawStr := ""
-	for {
-		data, _, err := reader.ReadLine()
-		if err != nil {
-			if err == io.EOF {
-				break
-			} else {
-				log.Fatal(err)
-			}
-		}
-
-		rawStr = rawStr + string(data)
-
-		// line breaker
-		if strings.HasSuffix(rawStr, ` \r`) {
-			rawStr = strings.TrimSuffix(rawStr, ` \r`)
-			continue
-		}
-
-		// trim space
-		rawStr = strings.TrimSpace(rawStr)
-
-		// empty line
-		if rawStr == "" {
-			if !prevEmpty {
-				fmt.Println()
-			}
-			prevEmpty = true
-			continue
-		}
-
-		// comment line
-		if strings.HasPrefix(rawStr, `//`) {
-			rawStr = ""
-			continue
-		}
-
-		prevEmpty = false
-
-		// load prefix
-		if strings.HasPrefix(rawStr, `load `) {
-			fileHandler(strings.TrimSpace(rawStr[5:]))
-			rawStr = ""
-			continue
-		}
-
-		eval(&rawStr)
-		rawStr = ""
 	}
 }

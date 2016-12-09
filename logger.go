@@ -7,28 +7,37 @@
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 var debugMode = false
 
-func Debug(s string, para ...interface{}) {
+func Debugf(s string, para ...interface{}) {
 	if debugMode {
 		s = "\033[0;33m" + s + "\033[0m\n"
 		fmt.Printf(s, para...)
 	}
 }
 
-func Info(s string, para ...interface{}) {
+func Infof(s string, para ...interface{}) {
 	s = "\033[0;32m" + s + "\033[0m\n"
 	fmt.Printf(s, para...)
 }
 
-func Warn(s string, para ...interface{}) {
+func Warnf(s string, para ...interface{}) {
 	s = "\033[0;35m" + s + "\033[0m\n"
 	fmt.Printf(s, para...)
 }
 
-func Error(s string, para ...interface{}) {
+func Errorf(s string, para ...interface{}) {
 	s = "\033[0;31m" + s + "\033[0m\n"
 	fmt.Printf(s, para...)
+}
+
+func Fatal(e error) {
+	err := "\033[0;31m" + e.Error() + "\033[0m\n"
+	fmt.Print(err)
+	os.Exit(2)
 }
