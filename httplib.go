@@ -81,7 +81,7 @@ func (h *httpReq) do() {
 			dataWalker("$resp.header", rm)
 		}
 
-		var bm = map[string]interface{}{}
+		var bm interface{}
 		err = json.Unmarshal(h.respBody, &bm)
 		if err == nil {
 			dataWalker("$body", bm)

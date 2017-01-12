@@ -22,8 +22,8 @@ func replacer(s *string) {
 }
 
 // set struct to varMap
-// SPACE{}
-// SPACE[]
+// STRUCT{}
+// ARRAY[]
 var structRgx = regexp.MustCompile(`\s{1,}?[\{|\[].+[\}|\]]$`)
 
 func structReplacer(s *string) {
