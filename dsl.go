@@ -124,10 +124,23 @@ var funcMap = map[string]func(*string) error{
 
 		return httplib.WithBody([]byte(*s))
 	},
+	"form": func(s *string) error {
+		params := strings.Split(*s, " ")
+		if len(params) != 2 {
+			return errors.New("form need 2 param")
+		}
+
+		varReplacer(&params[0])
+		varReplacer(&params[1])
+
+		log.Printf("[frm] '%s' '%s'", params[0], params[1])
+
+		return httplib.WithForm(params[0], params[1])
+	},
 	"multipart": func(s *string) error {
 		params := strings.Split(*s, " ")
 		if len(params) != 2 {
-			return errors.New("header need 2 param")
+			return errors.New("multipart need 2 param")
 		}
 
 		varReplacer(&params[0])
@@ -140,7 +153,7 @@ var funcMap = map[string]func(*string) error{
 	"multifile": func(s *string) error {
 		params := strings.Split(*s, " ")
 		if len(params) != 2 {
-			return errors.New("header need 2 param")
+			return errors.New("multifile need 2 param")
 		}
 
 		varReplacer(&params[0])

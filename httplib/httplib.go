@@ -22,6 +22,8 @@ import (
 var client = &http.Client{}
 
 var done bool
+var parsed = false
+
 var buff *bytes.Buffer
 var writer *multipart.Writer
 
@@ -30,6 +32,7 @@ var resp *http.Response
 
 func NewRequest(method string, url string) error {
 	done = false
+	parsed = false
 	buff = bytes.NewBuffer(nil)
 
 	var err error
@@ -50,7 +53,17 @@ func WithBody(data []byte) error {
 	return err
 }
 
-// TODO
+func WithForm(key string, val string) error {
+	if !parsed {
+		parsed = true
+		req.ParseForm()
+	}
+
+	req.Form.Add(key, val)
+
+	return nil
+}
+
 func WithMultiPart(key string, val string) error {
 	if writer == nil {
 		writer = multipart.NewWriter(buff)
@@ -93,6 +106,13 @@ func Do() error {
 			return err
 		}
 		writer = nil
+	}
+
+	if parsed {
+		_, err := buff.WriteString(req.Form.Encode())
+		if err != nil {
+			return err
+		}
 	}
 
 	req.Body = ioutil.NopCloser(buff)
