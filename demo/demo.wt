@@ -26,3 +26,11 @@ neq $n[1] $n[2]
 set m {"addrs":["a","b","c"]}
 echo $m.addrs
 eq $m.addrs[1] b
+
+// env
+env GOPATH
+echo `env GOPATH`
+
+// file
+echo `file xyz`
+echo `file ./xyz`

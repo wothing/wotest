@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wothing/wotest/file"
 	"github.com/wothing/wotest/httplib"
 	"github.com/wothing/wotest/log"
 	"github.com/wothing/wotest/store"
@@ -33,6 +34,11 @@ var funcMap = map[string]func(*string) error{
 		*s = os.Getenv(params[0])
 		return nil
 	},
+	"echo": func(s *string) error {
+		varReplacer(s)
+		log.Debugf(*s)
+		return nil
+	},
 	"pretty": func(s *string) error {
 		varReplacer(s)
 		var t interface{}
@@ -48,9 +54,13 @@ var funcMap = map[string]func(*string) error{
 		}
 		return nil
 	},
-	"echo": func(s *string) error {
+	"file": func(s *string) error {
 		varReplacer(s)
-		log.Debugf(*s)
+		data, err := file.Read(*s)
+		if err != nil {
+			return err
+		}
+		*s = string(data)
 		return nil
 	},
 	"set": func(s *string) error {

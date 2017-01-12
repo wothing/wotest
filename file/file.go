@@ -5,7 +5,7 @@
  * Created by elvizlai on 2016/10/12 16:37.
  */
 
-package main
+package file
 
 import (
 	"io/ioutil"
@@ -18,22 +18,18 @@ import (
 
 const fileSuffix = ".wt"
 
-// FileList parse loc
-func FileList(loc string) []string {
-	fs := strings.Split(loc, ";")
-
+// List return all files if loc is dir, or it returns self array
+func List(loc string, suffix string) []string {
 	data := []string{}
-	for i := range fs {
-		// check if is file or dir
-		fi, err := os.Stat(fs[i])
-		if err != nil {
-			log.Fatalf(err.Error())
-		}
-		if fi.IsDir() {
-			data = append(data, walk(fs[i], fileSuffix)...)
-		} else {
-			data = append(data, fs[i])
-		}
+	// check if is file or dir
+	fi, err := os.Stat(loc)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	if fi.IsDir() {
+		data = append(data, walk(loc, suffix)...)
+	} else {
+		data = append(data, loc)
 	}
 
 	return data
@@ -54,4 +50,9 @@ func walk(f string, suffix string) []string {
 	}
 
 	return list
+}
+
+// Read return contents of file
+func Read(fileName string) ([]byte, error) {
+	return ioutil.ReadFile(fileName)
 }

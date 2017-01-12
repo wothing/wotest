@@ -13,7 +13,10 @@ import (
 	"time"
 
 	"github.com/wothing/wotest/log"
+	"github.com/wothing/wotest/file"
 )
+
+const wtSuffix = ".wt"
 
 var passCount = 0
 var failCount = 0
@@ -43,8 +46,10 @@ func main() {
 	}
 
 	// read then run code
-	for _, v := range FileList(f) {
-		fileHandler(v)
+	for _, v := range strings.Split(f, ";") {
+		for _, v := range file.List(v, wtSuffix) {
+			fileHandler(v)
+		}
 	}
 
 	if failCount == 0 {

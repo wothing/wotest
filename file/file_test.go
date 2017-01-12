@@ -5,18 +5,21 @@
  * Created by elvizlai on 2016/10/12 16:45.
  */
 
-package main
+package file
 
 import (
 	"fmt"
 	"testing"
 )
 
-func TestFileList(t *testing.T) {
-	// fmt.Println(FileList("abc"))
-	// fmt.Println(FileList("abc;123"))
+func TestList(t *testing.T) {
+	fmt.Println(List(".", "go"))
 }
 
 func TestWalk(t *testing.T) {
-	fmt.Println(walk("./", fileSuffix))
+	fmt.Println(walk(".", "go"))
+}
+
+func TestRead(t *testing.T) {
+	fmt.Println(Read("./file.go"))
 }
