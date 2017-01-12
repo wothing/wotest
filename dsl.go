@@ -14,6 +14,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/wothing/wotest/httplib"
+	"github.com/wothing/wotest/log"
+	"github.com/wothing/wotest/store"
 )
 
 const pass = "\033[0;32m ✔ \033[0m"
@@ -40,13 +44,13 @@ var funcMap = map[string]func(*string) error{
 			if err != nil {
 				return err
 			}
-			Debugf(string(b))
+			log.Debugf(string(b))
 		}
 		return nil
 	},
 	"echo": func(s *string) error {
 		varReplacer(s)
-		Debugf(*s)
+		log.Debugf(*s)
 		return nil
 	},
 	"set": func(s *string) error {
@@ -61,9 +65,9 @@ var funcMap = map[string]func(*string) error{
 		var x interface{}
 		err := json.Unmarshal([]byte(params[1]), &x)
 		if err == nil {
-			dataWalker("$"+params[0], x)
+			store.DataWalker("$"+params[0], x)
 		} else {
-			varMap["$"+params[0]] = params[1]
+			store.Set("$"+params[0], params[1])
 		}
 
 		return nil
@@ -73,8 +77,7 @@ var funcMap = map[string]func(*string) error{
 
 		fmt.Printf("[get] '%s'\n", *s)
 
-		req = newReq("GET")
-		req.url = *s
+		httplib.NewRequest("GET", *s)
 		return nil
 	},
 	"post": func(s *string) error {
@@ -82,8 +85,7 @@ var funcMap = map[string]func(*string) error{
 
 		fmt.Printf("[pos] '%s'\n", *s)
 
-		req = newReq("POST")
-		req.url = *s
+		httplib.NewRequest("POST", *s)
 		return nil
 	},
 	"header": func(s *string) error {
@@ -97,13 +99,13 @@ var funcMap = map[string]func(*string) error{
 
 		fmt.Printf("[hed] '%s' '%s'\n", params[0], params[1])
 
-		req.header[strings.TrimSpace(params[0])] = strings.TrimSpace(params[1])
+		httplib.WithHeader(strings.TrimSpace(params[0]), strings.TrimSpace(params[1]))
 		return nil
 	},
 	"content": func(s *string) error {
 		varReplacer(s)
 		fmt.Printf("[cnt] '%s'\n", *s)
-		req.contentType = *s
+		httplib.WithContent(*s)
 		return nil
 	},
 	"body": func(s *string) error {
@@ -111,7 +113,7 @@ var funcMap = map[string]func(*string) error{
 
 		fmt.Printf("[bdy] '%s'\n", *s)
 
-		req.reqBody = *s
+		httplib.WithBody([]byte(*s))
 		return nil
 	},
 	"ret": func(s *string) error {
@@ -120,16 +122,16 @@ var funcMap = map[string]func(*string) error{
 			return errors.New("ret need 0 or 1 param")
 		}
 
-		req.do()
+		httplib.Do()
 
 		fmt.Print("[ret] ")
 
 		if params[0] == "" {
-			fmt.Print(req.resp.StatusCode, "\n")
+			fmt.Print(httplib.GetResp().StatusCode, "\n")
 		} else {
 			varReplacer(&params[0])
-			fmt.Printf("'%s' = '%s'", params[0], strconv.Itoa(req.resp.StatusCode))
-			if strconv.Itoa(req.resp.StatusCode) == params[0] {
+			fmt.Printf("'%s' = '%s'", params[0], strconv.Itoa(httplib.GetResp().StatusCode))
+			if strconv.Itoa(httplib.GetResp().StatusCode) == params[0] {
 				passCount++
 				fmt.Print(pass, "\n")
 			} else {
@@ -268,7 +270,7 @@ func eval(s *string) {
 		temp := v
 		v = strings.Trim(temp, "`")
 		eval(&v)
-		varMap["$.temp_"+strconv.Itoa(i)] = v
+		store.Set("$.temp_"+strconv.Itoa(i), v)
 		*s = strings.Replace(*s, temp, "$.temp_"+strconv.Itoa(i), 1)
 	}
 
@@ -278,12 +280,11 @@ func eval(s *string) {
 		suffix := strings.TrimSpace(strings.TrimPrefix(*s, x[0]))
 		err := f(&suffix)
 		if err != nil {
-			Errorf(err.Error())
-			os.Exit(1)
+			log.Fatalf(err.Error())
 		}
 		*s = suffix
 	} else {
 		failCount++
-		Warnf("no such method: '%s'", x[0])
+		log.Warnf("no such method: '%s'", x[0])
 	}
 }

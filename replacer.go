@@ -11,9 +11,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/wothing/wotest/log"
+	"github.com/wothing/wotest/store"
 )
 
-var varMap = map[string]string{}
+//var varMap = map[string]string{}
 
 func replacer(s *string) {
 	structReplacer(s)
@@ -29,7 +32,7 @@ var structRgx = regexp.MustCompile(`\s{1,}?[\{|\[].+[\}|\]]$`)
 func structReplacer(s *string) {
 	ss := structRgx.FindAllString(*s, -1)
 	for i, v := range ss {
-		varMap["$.stc."+strconv.Itoa(i)] = strings.TrimSpace(v)
+		store.Set("$.stc."+strconv.Itoa(i), strings.TrimSpace(v))
 		*s = strings.Replace(*s, v, " $.stc."+strconv.Itoa(i), 1)
 	}
 }
@@ -41,7 +44,7 @@ var quoteRgx = regexp.MustCompile(`"(.*)"`)
 func quoteReplacer(s *string) {
 	qs := quoteRgx.FindAllString(*s, -1)
 	for i, v := range qs {
-		varMap["$.quo."+strconv.Itoa(i)] = strings.Trim(v, `"`)
+		store.Set("$.quo."+strconv.Itoa(i), strings.Trim(v, `"`))
 		*s = strings.Replace(*s, v, "$.quo."+strconv.Itoa(i), 1)
 	}
 }
@@ -59,11 +62,11 @@ var varRgx = regexp.MustCompile(`\$[\w\.\[\]\-]+`)
 // TODO not found warn
 func varReplacer(s *string) {
 	for _, v := range varRgx.FindAllString(*s, -1) {
-		if k, ok := varMap[v]; ok {
+		if k, ok := store.Get(v); ok {
 			*s = strings.Replace(*s, v, k, 1)
 			varReplacer(s) // TODO is this ok?
 		} else {
-			Warnf("'%s' NOT EXIST", v)
+			log.Warnf("'%s' NOT EXIST", v)
 		}
 	}
 }

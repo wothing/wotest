@@ -11,6 +11,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/wothing/wotest/log"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -27,7 +28,7 @@ func fileHandler(fileName string) {
 
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
-		Fatal(err)
+		log.Fatalf(err.Error())
 	}
 
 	var prevEmpty = true
@@ -40,7 +41,7 @@ func fileHandler(fileName string) {
 			if err == io.EOF {
 				break
 			} else {
-				Fatal(err)
+				log.Fatalf(err.Error())
 			}
 		}
 

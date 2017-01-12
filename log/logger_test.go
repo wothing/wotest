@@ -5,13 +5,13 @@
  * Created by elvizlai on 2016/10/14 14:56.
  */
 
-package main
+package log
 
 import "testing"
 
 func TestDebug(t *testing.T) {
 	Debugf("hidden")
-	debugMode = true
+	debug = true
 	Debugf("debug")
 }
 

@@ -9,10 +9,11 @@ package main
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/wothing/wotest/log"
 )
 
 const fileSuffix = ".wt"
@@ -26,7 +27,7 @@ func FileList(loc string) []string {
 		// check if is file or dir
 		fi, err := os.Stat(fs[i])
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf(err.Error())
 		}
 		if fi.IsDir() {
 			data = append(data, walk(fs[i], fileSuffix)...)
@@ -41,7 +42,7 @@ func FileList(loc string) []string {
 func walk(f string, suffix string) []string {
 	fis, err := ioutil.ReadDir(f)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf(err.Error())
 	}
 
 	list := []string{}
