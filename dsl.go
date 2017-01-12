@@ -275,8 +275,8 @@ func eval(s *string) {
 	replacer(s)
 
 	// internal cmd
-	cmds := cmdRgx.FindAllString(*s, -1)
-	for i, v := range cmds {
+	cmdList := cmdRgx.FindAllString(*s, -1)
+	for i, v := range cmdList {
 		temp := v
 		v = strings.Trim(temp, "`")
 		eval(&v)
