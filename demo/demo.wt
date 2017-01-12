@@ -32,5 +32,6 @@ env GOPATH
 echo `env GOPATH`
 
 // file
-echo `file xyz`
-echo `file ./xyz`
+echo `file upfile`
+echo `file ./upfile`
+

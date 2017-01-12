@@ -1,0 +1,62 @@
+echo "get ip"
+get http://httpbin.org/ip
+ret 200
+set ip $body.origin
+echo $ip
+
+echo "simple get"
+get http://httpbin.org/get
+ret 200
+echo $body
+
+echo "get with query"
+get http://httpbin.org/get?query=elvizlai
+ret 200
+echo "arg is: "$body.args.query
+
+echo "simple post"
+post http://httpbin.org/post
+ret 200
+echo $body
+
+echo "post with header"
+post http://httpbin.org/post
+header key value
+ret 200
+echo $body.headers
+
+echo "post with text"
+post http://httpbin.org/post
+body "a quick brown fox jumps over the lazy dog"
+ret 200
+echo $body.data
+
+echo "post with json"
+post http://httpbin.org/post
+body {"ip":"$ip"}
+ret 200
+echo $body.data
+
+echo "post with form"
+post http://httpbin.org/post?origin=elvizlai
+form key1 value1
+form key2 value2
+ret 200
+echo $body
+
+echo "post with xml"
+post http://httpbin.org/post
+body <xml><ToUserName><![CDATA[gh_a700bb4a6666]]></ToUserName> \r
+     <FromUserName><![CDATA[omC1Vwlc0nmu-j2qNW4LlaxWUMuw]]></FromUserName> \r
+     <CreateTime>1484218087</CreateTime> \r
+     </xml>
+ret 200
+echo $body
+
+echo "post with multipart"
+post http://httpbin.org/post
+multipart ip $ip
+multifile xxoo ./upfile
+ret 200
+echo $body
+
