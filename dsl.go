@@ -182,13 +182,7 @@ var funcMap = map[string]func(*string) error{
 		} else {
 			varReplacer(&params[0])
 			buff.WriteString(fmt.Sprintf("'%s' = '%s'", params[0], strconv.Itoa(httplib.GetResp().StatusCode)))
-			if strconv.Itoa(httplib.GetResp().StatusCode) == params[0] {
-				passCount++
-				buff.WriteString(pass)
-			} else {
-				failCount++
-				buff.WriteString(failed)
-			}
+			*s = marker(buff, strconv.Itoa(httplib.GetResp().StatusCode) == params[0])
 		}
 
 		log.Printf(buff.String())
@@ -271,6 +265,38 @@ var funcMap = map[string]func(*string) error{
 		buff := bytes.NewBuffer(nil)
 		buff.WriteString(fmt.Sprintf("[ast] '%s' ≥ '%s'", params[0], params[1]))
 		*s = marker(buff, params[0] >= params[1])
+		log.Printf(buff.String())
+		return nil
+	},
+	// less than
+	"lt": func(s *string) error {
+		params := strings.Split(*s, " ")
+		if len(params) != 2 {
+			return errors.New("lt need 2 param")
+		}
+
+		varReplacer(&params[0])
+		varReplacer(&params[1])
+
+		buff := bytes.NewBuffer(nil)
+		buff.WriteString(fmt.Sprintf("[ast] '%s' < '%s'", params[0], params[1]))
+		*s = marker(buff, params[0] < params[1])
+		log.Printf(buff.String())
+		return nil
+	},
+	// less than or equal
+	"lte": func(s *string) error {
+		params := strings.Split(*s, " ")
+		if len(params) != 2 {
+			return errors.New("lte need 2 param")
+		}
+
+		varReplacer(&params[0])
+		varReplacer(&params[1])
+
+		buff := bytes.NewBuffer(nil)
+		buff.WriteString(fmt.Sprintf("[ast] '%s' ≤ '%s'", params[0], params[1]))
+		*s = marker(buff, params[0] <= params[1])
 		log.Printf(buff.String())
 		return nil
 	},

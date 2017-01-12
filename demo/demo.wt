@@ -25,7 +25,8 @@ neq $n[1] $n[2]
 // array
 set m {"addrs":["a","b","c"]}
 echo $m.addrs
-eq $m.addrs[1] b
+set b `eq $m.addrs[1] b`
+echo $b
 
 // env
 env GOPATH

@@ -8,27 +8,33 @@
 
 ```
 load [file.wt]: 加载依赖测试用例
+
 set [name var]: 设置全局变量
 $var: 取出全局变量。注意：$header,$body,$resp相关的前缀为保留前缀，请勿占用
-env [name]: 读取系统环境变量
 
-echo [var]: 输出，一般用于调试
+env [name]: 读取系统环境变量
+file [path]: 读入文件
+
+echo [var]: 输出，用于调试
 pretty [var]: 美化json并输出，用于调试
 
 get [url]: 构建GET请求
 post [url]: 构建POST请求
-header [key value]: 配置请求Header
-body [var]: 配置请求Body
-form [key value]: 配置请求form
+header [key value]: 请求Header
+body [var]: 请求Body
+form [key value]: 请求form
 multipart [key value]: multipart k-v
 multifile [name path]: multipart file
-ret [code?]: 发起请求，并校验http status code。其中，code为空则不做校验
+ret [code?]: 发起请求，若code不为空则校验http status code。
 
-has [a b]: 校验a中时候含有b
-eq: [a b]: 校验a是否等于b
-neq: [a b]: 校验a不等于b
-gt: [a b]: 校验a>b
-gte: [a b]: 校验a>=b
+断言为true则返回T，否则返回F
+has [a b]: a是否含有b
+eq: [a b]: a是否等于b
+neq: [a b]: a不等于b
+gt: [a b]: a大于b
+gte: [a b]: a大于等于b
+lt: [a b]: a小于b
+lte [a b]: a小于等于b
 ```
 
 如果一个参数中含有空格，请使用双引号'"'包裹，例如："Bearer xxxxxx"
@@ -41,5 +47,18 @@ gte: [a b]: 校验a>=b
 用例请参见`demo/http.wt`
 
 ![demo](./demo.png)
+
+### TODO:
+
+1、regexp 正则匹配
+
+2、条件语句
+```
+if x then
+a
+else
+b
+end
+```
 
 ### FAQ:
