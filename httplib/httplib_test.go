@@ -50,3 +50,28 @@ func TestPostWithBody(t *testing.T) {
 
 	fmt.Println(req)
 }
+
+func TestPostWithMultipart(t *testing.T) {
+	err := NewRequest("POST", "https://echo.paw.cloud")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	WithMultiPart("key", "value")
+
+	fmt.Println(req)
+	Do()
+}
+
+func TestPostWithMultipartFile(t *testing.T) {
+	err := NewRequest("POST", "https://echo.paw.cloud")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	WithMultiPart("key", "value")
+	WithMultiPartFile("xxoo", "./httplib.go")
+
+	fmt.Println(req)
+	Do()
+}

@@ -8,6 +8,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -34,6 +35,15 @@ var funcMap = map[string]func(*string) error{
 		*s = os.Getenv(params[0])
 		return nil
 	},
+	"file": func(s *string) error {
+		varReplacer(s)
+		data, err := file.Read(*s)
+		if err != nil {
+			return err
+		}
+		*s = string(data)
+		return nil
+	},
 	"echo": func(s *string) error {
 		varReplacer(s)
 		log.Debugf(*s)
@@ -52,15 +62,6 @@ var funcMap = map[string]func(*string) error{
 			}
 			log.Debugf(string(b))
 		}
-		return nil
-	},
-	"file": func(s *string) error {
-		varReplacer(s)
-		data, err := file.Read(*s)
-		if err != nil {
-			return err
-		}
-		*s = string(data)
 		return nil
 	},
 	"set": func(s *string) error {
@@ -85,18 +86,16 @@ var funcMap = map[string]func(*string) error{
 	"get": func(s *string) error {
 		varReplacer(s)
 
-		fmt.Printf("[get] '%s'\n", *s)
+		log.Printf("[get] '%s'", *s)
 
-		httplib.NewRequest("GET", *s)
-		return nil
+		return httplib.NewRequest("GET", *s)
 	},
 	"post": func(s *string) error {
 		varReplacer(s)
 
-		fmt.Printf("[pos] '%s'\n", *s)
+		log.Printf("[pos] '%s'", *s)
 
-		httplib.NewRequest("POST", *s)
-		return nil
+		return httplib.NewRequest("POST", *s)
 	},
 	"header": func(s *string) error {
 		params := strings.Split(*s, " ")
@@ -107,24 +106,49 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		fmt.Printf("[hed] '%s' '%s'\n", params[0], params[1])
+		log.Printf("[hed] '%s' '%s'", params[0], params[1])
 
 		httplib.WithHeader(strings.TrimSpace(params[0]), strings.TrimSpace(params[1]))
 		return nil
 	},
 	"content": func(s *string) error {
 		varReplacer(s)
-		fmt.Printf("[cnt] '%s'\n", *s)
+		log.Printf("[cnt] 'Content-Type' '%s'", *s)
 		httplib.WithContent(*s)
 		return nil
 	},
 	"body": func(s *string) error {
 		varReplacer(s)
 
-		fmt.Printf("[bdy] '%s'\n", *s)
+		log.Printf("[bdy] '%s'", *s)
 
-		httplib.WithBody([]byte(*s))
-		return nil
+		return httplib.WithBody([]byte(*s))
+	},
+	"multipart": func(s *string) error {
+		params := strings.Split(*s, " ")
+		if len(params) != 2 {
+			return errors.New("header need 2 param")
+		}
+
+		varReplacer(&params[0])
+		varReplacer(&params[1])
+
+		log.Printf("[mup] '%s' '%s'", params[0], params[1])
+
+		return httplib.WithMultiPart(params[0], params[1])
+	},
+	"multifile": func(s *string) error {
+		params := strings.Split(*s, " ")
+		if len(params) != 2 {
+			return errors.New("header need 2 param")
+		}
+
+		varReplacer(&params[0])
+		varReplacer(&params[1])
+
+		log.Printf("[muf] '%s' '%s'", params[0], params[1])
+
+		return httplib.WithMultiPartFile(params[0], params[1])
 	},
 	"ret": func(s *string) error {
 		params := strings.Split(*s, " ")
@@ -132,24 +156,29 @@ var funcMap = map[string]func(*string) error{
 			return errors.New("ret need 0 or 1 param")
 		}
 
-		httplib.Do()
+		err := httplib.Do()
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
 
-		fmt.Print("[ret] ")
+		buff := bytes.NewBuffer(nil)
+		buff.WriteString("[ret] ")
 
 		if params[0] == "" {
-			fmt.Print(httplib.GetResp().StatusCode, "\n")
+			buff.WriteString(strconv.Itoa(httplib.GetResp().StatusCode))
 		} else {
 			varReplacer(&params[0])
-			fmt.Printf("'%s' = '%s'", params[0], strconv.Itoa(httplib.GetResp().StatusCode))
+			buff.WriteString(fmt.Sprintf("'%s' = '%s'", params[0], strconv.Itoa(httplib.GetResp().StatusCode)))
 			if strconv.Itoa(httplib.GetResp().StatusCode) == params[0] {
 				passCount++
-				fmt.Print(pass, "\n")
+				buff.WriteString(pass)
 			} else {
 				failCount++
-				fmt.Print(failed, "\n")
+				buff.WriteString(failed)
 			}
 		}
 
+		log.Printf(buff.String())
 		return nil
 	},
 	// has
@@ -162,16 +191,10 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		fmt.Printf("[ast] '%s' ⊇ '%s'", params[0], params[1])
-
-		if strings.Contains(params[0], params[1]) {
-			passCount++
-			fmt.Print(pass, "\n")
-		} else {
-			failCount++
-			fmt.Print(failed, "\n")
-		}
-
+		buff := bytes.NewBuffer(nil)
+		buff.WriteString(fmt.Sprintf("[ast] '%s' ⊇ '%s'", params[0], params[1]))
+		*s = marker(buff, strings.Contains(params[0], params[1]))
+		log.Printf(buff.String())
 		return nil
 	},
 	// equal
@@ -184,15 +207,10 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		fmt.Printf("[ast] '%s' = '%s'", params[0], params[1])
-
-		if params[0] == params[1] {
-			passCount++
-			fmt.Println(pass)
-		} else {
-			failCount++
-			fmt.Println(failed)
-		}
+		buff := bytes.NewBuffer(nil)
+		buff.WriteString(fmt.Sprintf("[ast] '%s' = '%s'", params[0], params[1]))
+		*s = marker(buff, params[0] == params[1])
+		log.Printf(buff.String())
 		return nil
 	},
 	// not equal
@@ -205,15 +223,10 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		fmt.Printf("[ast] '%s' ≠ '%s'", params[0], params[1])
-
-		if params[0] != params[1] {
-			passCount++
-			fmt.Print(pass, "\n")
-		} else {
-			failCount++
-			fmt.Print(failed, "\n")
-		}
+		buff := bytes.NewBuffer(nil)
+		buff.WriteString(fmt.Sprintf("[ast] '%s' ≠ '%s'", params[0], params[1]))
+		*s = marker(buff, params[0] != params[1])
+		log.Printf(buff.String())
 		return nil
 	},
 	// greater than
@@ -226,15 +239,10 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		fmt.Printf("[ast] '%s' > '%s'", params[0], params[1])
-
-		if params[0] > params[1] {
-			passCount++
-			fmt.Print(pass, "\n")
-		} else {
-			failCount++
-			fmt.Print(failed, "\n")
-		}
+		buff := bytes.NewBuffer(nil)
+		buff.WriteString(fmt.Sprintf("[ast] '%s' > '%s'", params[0], params[1]))
+		*s = marker(buff, params[0] > params[1])
+		log.Printf(buff.String())
 		return nil
 	},
 	// greater than or equal
@@ -247,14 +255,10 @@ var funcMap = map[string]func(*string) error{
 		varReplacer(&params[0])
 		varReplacer(&params[1])
 
-		fmt.Printf("[ast] '%s' ≥ '%s'", params[0], params[1])
-		if params[0] >= params[1] {
-			passCount++
-			fmt.Print(pass, "\n")
-		} else {
-			failCount++
-			fmt.Print(failed, "\n")
-		}
+		buff := bytes.NewBuffer(nil)
+		buff.WriteString(fmt.Sprintf("[ast] '%s' ≥ '%s'", params[0], params[1]))
+		*s = marker(buff, params[0] >= params[1])
+		log.Printf(buff.String())
 		return nil
 	},
 	// TODO
@@ -296,5 +300,17 @@ func eval(s *string) {
 	} else {
 		failCount++
 		log.Warnf("no such method: '%s'", x[0])
+	}
+}
+
+func marker(buff *bytes.Buffer, tf bool) string {
+	if tf {
+		passCount++
+		buff.WriteString(pass)
+		return "T"
+	} else {
+		failCount++
+		buff.WriteString(failed)
+		return "F"
 	}
 }

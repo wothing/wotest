@@ -31,6 +31,10 @@ func Debugf(format string, para ...interface{}) {
 	}
 }
 
+func Printf(format string, para ...interface{}) {
+	std.Printf(format, para...)
+}
+
 func Infof(format string, para ...interface{}) {
 	std.Printf("\033[32m"+format+"\033[0m", para...)
 }

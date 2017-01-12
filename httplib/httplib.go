@@ -10,8 +10,11 @@ package httplib
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"os"
 
 	"github.com/wothing/wotest/store"
 )
@@ -20,6 +23,8 @@ var client = &http.Client{}
 
 var done bool
 var buff *bytes.Buffer
+var writer *multipart.Writer
+
 var req *http.Request
 var resp *http.Response
 
@@ -32,43 +37,70 @@ func NewRequest(method string, url string) error {
 	return err
 }
 
-func WithContent(value string) {
-	req.Header.Set("content-type", value)
+func WithContent(val string) {
+	req.Header.Set("Content-Type", val)
 }
 
-func WithHeader(key string, value string) {
-	req.Header.Add(key, value)
+func WithHeader(key string, val string) {
+	req.Header.Add(key, val)
 }
 
 func WithBody(data []byte) error {
 	_, err := buff.Write(data)
+	return err
+}
+
+// TODO
+func WithMultiPart(key string, val string) error {
+	if writer == nil {
+		writer = multipart.NewWriter(buff)
+	}
+
+	return writer.WriteField(key, val)
+}
+
+func WithMultiPartFile(name string, filePath string) error {
+	if writer == nil {
+		writer = multipart.NewWriter(buff)
+	}
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	part, err := writer.CreateFormFile(name, filePath)
 	if err != nil {
 		return err
 	}
 
-	if req.Body == nil {
-		req.Body = ioutil.NopCloser(buff)
-	}
+	_, err = io.Copy(part, file)
 
-	return nil
+	return err
 }
 
-// TODO
-func WithMultiPart() {
-
-}
-
-func Do() {
+func Do() error {
 	if done {
-		return
+		return nil
 	}
 
 	done = true
 
+	if writer != nil {
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		if err := writer.Close(); err != nil {
+			return err
+		}
+		writer = nil
+	}
+
+	req.Body = ioutil.NopCloser(buff)
+
 	var err error
 	resp, err = client.Do(req)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// remove previous data
@@ -97,6 +129,8 @@ func Do() {
 		store.Set("$body", string(data))
 		store.Set("$resp.body", string(data))
 	}
+
+	return nil
 }
 
 func GetResp() *http.Response {
