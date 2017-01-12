@@ -71,5 +71,6 @@ func varReplacer(s *string) {
 	}
 }
 
-// parse `xyz xyz`->xyz xyz
-var cmdRgx = regexp.MustCompile("\\`[\\w\\s\\$.]+\\`")
+// parse `xyz xyz`->xyz xyz;
+// `NOT_EMPTY` should work
+var cmdRgx = regexp.MustCompile("`.+`")
