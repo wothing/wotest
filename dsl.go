@@ -100,6 +100,12 @@ var funcMap = map[string]func(*string) error{
 		req.header[strings.TrimSpace(params[0])] = strings.TrimSpace(params[1])
 		return nil
 	},
+	"content": func(s *string) error {
+		varReplacer(s)
+		fmt.Printf("[cnt] '%s'\n", *s)
+		req.contentType = *s
+		return nil
+	},
 	"body": func(s *string) error {
 		varReplacer(s)
 

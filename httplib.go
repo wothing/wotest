@@ -23,9 +23,9 @@ type httpReq struct {
 	method string
 	url    string
 
-	reqBody string
-
-	header map[string]string
+	header      map[string]string
+	contentType string
+	reqBody     string
 
 	resp     *http.Response
 	respBody []byte
@@ -51,6 +51,10 @@ func (h *httpReq) do() {
 		req, err := http.NewRequest(h.method, h.url, bytes.NewBuffer([]byte(h.reqBody)))
 		if err != nil {
 			log.Fatal(err)
+		}
+
+		if h.contentType != "" {
+			req.Header.Add("Content-Type", h.contentType)
 		}
 
 		for k, v := range h.header {
