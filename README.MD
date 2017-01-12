@@ -19,6 +19,9 @@ get [url]: 构建GET请求
 post [url]: 构建POST请求
 header [key value]: 配置请求Header
 body [var]: 配置请求Body
+form [key value]: 配置请求form
+multipart [key value]: multipart k-v
+multifile [name path]: multipart file
 ret [code?]: 发起请求，并校验http status code。其中，code为空则不做校验
 
 has [a b]: 校验a中时候含有b
@@ -35,7 +38,7 @@ gte: [a b]: 校验a>=b
 支持array；
 支持struct;
 
-用例请参见`demo`
+用例请参见`demo/http.wt`
 
 ![demo](./demo.png)
 
